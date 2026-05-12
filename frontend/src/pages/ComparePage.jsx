@@ -1,10 +1,31 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, TrashIcon, Users } from 'lucide-react'
+import { TrashIcon, Users, XCircle, AlertTriangle } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
 } from 'recharts'
+
+function FlagTooltip({ icon, flags }) {
+  return (
+    <div className="relative group/tip z-99">
+      {icon}
+      <div className="absolute hidden w-64 mb-2 -translate-x-1/2 pointer-events-none bottom-full left-1/2 group-hover/tip:block ">
+        <div className="bg-ink-900 border border-ink-600 rounded-xl px-3 py-2.5 shadow-xl space-y-1.5">
+          {flags.map((f, i) => (
+            <div key={i} className="flex items-start gap-2">
+              {f.level === 'error'
+                ? <XCircle size={11} className="text-danger mt-0.5 shrink-0" />
+                : <AlertTriangle size={11} className="text-warning mt-0.5 shrink-0" />}
+              <span className="text-xs leading-snug text-ink-200">{f.message}</span>
+            </div>
+          ))}
+        </div>
+        <div className="w-2 h-2 mx-auto -mt-1 rotate-45 border-b border-r bg-ink-900 border-ink-600" />
+      </div>
+    </div>
+  )
+}
 
 const EASE_COLORS = { again: '#ef4444', hard: '#f59e0b', good: '#5b6af7', easy: '#22c55e' }
 const STUDENT_COLORS = ['#5b6af7','#22c55e','#f59e0b','#ef4444','#a78bfa','#34d399']
@@ -12,8 +33,8 @@ const STUDENT_COLORS = ['#5b6af7','#22c55e','#f59e0b','#ef4444','#a78bfa','#34d3
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-ink-800 border border-ink-600 rounded-xl px-4 py-3 text-sm shadow-xl">
-      <p className="font-display font-medium text-ink-100 mb-2">{label}</p>
+    <div className="px-4 py-3 text-sm border shadow-xl bg-ink-800 border-ink-600 rounded-xl">
+      <p className="mb-2 font-medium font-display text-ink-100">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }} className="font-mono">{p.name}: {p.value}{p.unit || ''}</p>
       ))}
@@ -47,16 +68,16 @@ export default function ComparePage() {
 
   if (loading) return (
     <div className="space-y-5 animate-pulse">
-      <div className="h-8 w-48 shimmer-bg rounded-xl" />
+      <div className="w-48 h-8 shimmer-bg rounded-xl" />
       <div className="h-64 shimmer-bg rounded-2xl" />
       <div className="h-64 shimmer-bg rounded-2xl" />
     </div>
   )
 
   if (!students.length) return (
-    <div className="text-center py-20">
+    <div className="py-20 text-center">
       <Users size={40} className="mx-auto mb-4 text-ink-600" />
-      <p className="text-ink-400 mb-4">No students loaded yet.</p>
+      <p className="mb-4 text-ink-400">No students loaded yet.</p>
       <button onClick={() => navigate('/upload')} className="btn-primary">Go to upload</button>
     </div>
   )
@@ -75,26 +96,26 @@ export default function ComparePage() {
   return (
     <div className="max-w-5xl mx-auto space-y-7 animate-fade-up">
       <div>
-        <h1 className="font-display text-3xl font-semibold text-ink-50">Class comparison</h1>
-        <p className="text-ink-400 mt-1">{students.length} students loaded this week</p>
+        <h1 className="text-3xl font-semibold font-display text-ink-50">Class comparison</h1>
+        <p className="mt-1 text-ink-400">{students.length} students loaded this week</p>
       </div>
 
       {/* Summary table */}
-      <div className="card overflow-hidden p-0">
+      <div className="z-20 p-0 overflow-hidden card">
         <div className="px-5 py-4 border-b border-ink-700">
-          <h3 className="font-display font-semibold text-ink-100">Class overview</h3>
+          <h3 className="font-semibold font-display text-ink-100">Class overview</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-ink-700">
-                <th className="text-left px-5 py-3 label">Student</th>
-                <th className="text-left px-4 py-3 label">Type</th>
-                <th className="text-right px-4 py-3 label">Reviews</th>
-                <th className="text-right px-4 py-3 label">Active days</th>
-                <th className="text-right px-4 py-3 label">Retention</th>
-                <th className="text-right px-4 py-3 label">Avg time</th>
-                <th className="text-right px-4 py-3 label">Top button</th>
+                <th className="px-5 py-3 text-left label">Student</th>
+                <th className="px-4 py-3 text-left label">Type</th>
+                <th className="px-4 py-3 text-right label">Reviews</th>
+                <th className="px-4 py-3 text-right label">Active days</th>
+                <th className="px-4 py-3 text-right label">Retention</th>
+                <th className="px-4 py-3 text-right label">Avg time</th>
+                <th className="px-4 py-3 text-right label">Top button</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -103,15 +124,27 @@ export default function ComparePage() {
                 const retColor = s.retention >= 70 ? 'text-success' : s.retention >= 40 ? 'text-warning' : 'text-danger'
                 const btnColor = s.dominantButton === 'Again' ? 'text-danger' : s.dominantButton === 'Hard' ? 'text-warning' : s.dominantButton === 'Good' ? 'text-brand-300' : 'text-success'
                 return (
-                  <tr key={s.id} className="border-b border-ink-700/50 hover:bg-ink-700/30 transition-colors cursor-pointer group"
+                  <tr key={s.id} className="transition-colors border-b cursor-pointer border-ink-700/50 hover:bg-ink-700/30 group"
                   >
                     <td className="px-5 py-3.5" onClick={() => navigate(`/student/${s.id}`)}>
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-display font-semibold text-white"
+                        <div className="flex items-center justify-center text-xs font-semibold text-white rounded-lg w-7 h-7 font-display"
                           style={{ background: STUDENT_COLORS[i % STUDENT_COLORS.length] }}>
                           {s.studentName[0]}
                         </div>
                         <span className="font-display text-ink-100">{s.studentName}</span>
+                        {s.validationErrors > 0 && (
+                          <FlagTooltip
+                            icon={<XCircle size={13} className="text-danger shrink-0" />}
+                            flags={s.validationFlags}
+                          />
+                        )}
+                        {s.validationErrors === 0 && s.validationWarnings > 0 && (
+                          <FlagTooltip
+                            icon={<AlertTriangle size={13} className="text-warning shrink-0" />}
+                            flags={s.validationFlags}
+                          />
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
@@ -139,8 +172,8 @@ export default function ComparePage() {
 
       {/* Retention comparison */}
       <div className="card">
-        <h3 className="font-display font-semibold text-ink-100 mb-1">Retention comparison</h3>
-        <p className="text-xs text-ink-400 mb-5">% of cards rated Good or Easy — higher is better</p>
+        <h3 className="mb-1 font-semibold font-display text-ink-100">Retention comparison</h3>
+        <p className="mb-5 text-xs text-ink-400">% of cards rated Good or Easy — higher is better</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={retentionData} barSize={40}>
             <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" vertical={false} />
@@ -158,8 +191,8 @@ export default function ComparePage() {
 
       {/* Button breakdown side by side */}
       <div className="card">
-        <h3 className="font-display font-semibold text-ink-100 mb-1">Button breakdown per student</h3>
-        <p className="text-xs text-ink-400 mb-5">How each student rated their cards — Again means struggles, Easy means confident</p>
+        <h3 className="mb-1 font-semibold font-display text-ink-100">Button breakdown per student</h3>
+        <p className="mb-5 text-xs text-ink-400">How each student rated their cards — Again means struggles, Easy means confident</p>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={easeCompare} barSize={16}>
             <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" vertical={false} />
@@ -172,7 +205,7 @@ export default function ComparePage() {
             <Bar dataKey="Easy" fill={EASE_COLORS.easy} radius={[0,0,4,4]} stackId="a" />
           </BarChart>
         </ResponsiveContainer>
-        <div className="flex gap-4 mt-3 justify-center flex-wrap">
+        <div className="flex flex-wrap justify-center gap-4 mt-3">
           {Object.entries(EASE_COLORS).map(([k, c]) => (
             <div key={k} className="flex items-center gap-1.5 text-xs text-ink-400">
               <div className="w-3 h-3 rounded-sm" style={{ background: c }} />
@@ -184,8 +217,8 @@ export default function ComparePage() {
 
       {/* Activity comparison */}
       <div className="card">
-        <h3 className="font-display font-semibold text-ink-100 mb-1">Practice volume</h3>
-        <p className="text-xs text-ink-400 mb-5">Total cards reviewed this week</p>
+        <h3 className="mb-1 font-semibold font-display text-ink-100">Practice volume</h3>
+        <p className="mb-5 text-xs text-ink-400">Total cards reviewed this week</p>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={activityData} barSize={40}>
             <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" vertical={false} />

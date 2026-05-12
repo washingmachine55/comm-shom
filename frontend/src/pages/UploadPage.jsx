@@ -27,6 +27,9 @@ export default function UploadPage() {
   const [results, setResults] = useState([])
   const [uploading, setUploading] = useState(false)
   const [uploadErrors, setUploadErrors] = useState([])
+  const [weekMode, setWeekMode] = useState('current')
+  const [customStart, setCustomStart] = useState('')
+  const [customEnd, setCustomEnd] = useState('')
   const navigate = useNavigate()
 
   const onDrop = useCallback(async acceptedFiles => {
@@ -39,8 +42,14 @@ export default function UploadPage() {
     const formData = new FormData()
     jsonlFiles.forEach(f => formData.append('files', f))
 
+    const params = new URLSearchParams({ weekMode })
+    if (weekMode === 'custom' && customStart && customEnd) {
+      params.set('customStart', customStart)
+      params.set('customEnd', customEnd)
+    }
+
     try {
-      const res = await fetch('http://localhost:3001/api/upload', {
+      const res = await fetch(`http://localhost:3001/api/upload?${params}`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -57,7 +66,7 @@ export default function UploadPage() {
     } finally {
       setUploading(false)
     }
-  }, [])
+  }, [weekMode, customStart, customEnd])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -76,6 +85,49 @@ export default function UploadPage() {
       <div>
         <h1 className="font-display text-3xl font-semibold text-ink-50">Weekly Upload</h1>
         <p className="text-ink-400 mt-1">Drop your students' Anki export files below to generate this week's report.</p>
+      </div>
+
+      {/* Week mode toggle */}
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm text-ink-400">Week window:</span>
+        <div className="flex rounded-lg overflow-hidden border border-ink-600">
+          <button
+            onClick={() => setWeekMode('current')}
+            className={`px-3 py-1.5 text-sm transition-colors ${weekMode === 'current' ? 'bg-brand text-white' : 'text-ink-400 hover:text-ink-200'}`}
+          >
+            Current week
+          </button>
+          <button
+            onClick={() => setWeekMode('data')}
+            className={`px-3 py-1.5 text-sm transition-colors ${weekMode === 'data' ? 'bg-brand text-white' : 'text-ink-400 hover:text-ink-200'}`}
+          >
+            Use data dates
+          </button>
+          <button
+            onClick={() => setWeekMode('custom')}
+            className={`px-3 py-1.5 text-sm transition-colors ${weekMode === 'custom' ? 'bg-brand text-white' : 'text-ink-400 hover:text-ink-200'}`}
+          >
+            Custom range
+          </button>
+        </div>
+        {weekMode === 'custom' && (
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={customStart}
+              onChange={e => setCustomStart(e.target.value)}
+              className="bg-ink-800 border border-ink-600 rounded-lg px-2 py-1.5 text-sm text-ink-100 focus:outline-none focus:border-brand"
+            />
+            <span className="text-ink-500 text-sm">→</span>
+            <input
+              type="date"
+              value={customEnd}
+              onChange={e => setCustomEnd(e.target.value)}
+              min={customStart}
+              className="bg-ink-800 border border-ink-600 rounded-lg px-2 py-1.5 text-sm text-ink-100 focus:outline-none focus:border-brand"
+            />
+          </div>
+        )}
       </div>
 
       {/* Drop Zone */}
@@ -116,7 +168,7 @@ export default function UploadPage() {
         <div className="space-y-2">
           {uploadErrors.map((e, i) => (
             <div key={i} className="flex items-center gap-3 bg-danger/10 border border-danger/20 rounded-xl px-4 py-3 text-sm">
-              <XCircle size={15} className="text-danger flex-shrink-0" />
+              <XCircle size={15} className="text-danger shrink-0" />
               <span className="text-danger font-mono">{e.file}</span>
               <span className="text-ink-300">{e.error}</span>
             </div>
@@ -151,7 +203,7 @@ export default function UploadPage() {
                 onClick={() => navigate(`/student/${r.id}`)}
                 className="card-sm flex items-center gap-4 cursor-pointer hover:border-ink-500 hover:bg-ink-700/50 transition-all group"
               >
-                <div className="w-10 h-10 rounded-xl bg-brand-900 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-brand-900 flex items-center justify-center shrink-0">
                   <span className="font-display font-semibold text-brand-300 text-sm">
                     {r.studentName.split(' ').map(w=>w[0]).join('').slice(0,2)}
                   </span>
@@ -168,7 +220,7 @@ export default function UploadPage() {
                   <RetentionBar pct={r.summary.retention} />
                 </div>
 
-                <div className="flex items-center gap-6 flex-shrink-0 text-right">
+                <div className="flex items-center gap-6 shrink-0 text-right">
                   <div>
                     <p className="label">Reviews</p>
                     <p className="font-display font-semibold text-ink-100 text-lg">{r.summary.totalReviews}</p>

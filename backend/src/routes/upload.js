@@ -26,9 +26,21 @@ router.post('/', upload.array('files'), (req, res) => {
       try {
         const text = file.buffer.toString('utf-8');
         const lines = text.trim().split('\n').filter(Boolean);
+        if (lines.length === 0) {
+          errors.push({ file: file.originalname, error: 'File is empty.' });
+          continue;
+        }
         const records = lines.map(l => JSON.parse(l));
-        const studentName = file.originalname.replace('.jsonl', '').replace(/_/g, ' ');
-        const analysis = analyzeSession(studentName, records);
+        const studentName = file.originalname
+          .replace(/\.jsonl$/i, '')
+          .replace(/^llm_review_stats_/i, '')
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, c => c.toUpperCase())
+          .trim();
+        const weekMode = ['data', 'custom'].includes(req.query.weekMode) ? req.query.weekMode : 'current';
+        const customStart = req.query.customStart || null;
+        const customEnd = req.query.customEnd || null;
+        const analysis = analyzeSession(studentName, records, { weekMode, customStart, customEnd });
         const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         sessionStore.set(id, analysis);
         results.push({ id, studentName: analysis.studentName, summary: analysis.summary, validation: analysis.validation });

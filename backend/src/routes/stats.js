@@ -40,7 +40,9 @@ router.get('/compare/all', (req, res) => {
       activeDays: data.summary.activeDays,
       dominantButton: data.summary.dominantButton,
       easeDistribution: data.summary.easeDistribution,
-      validationFlags: data.validation.flags.length,
+      validationErrors: data.validation.flags.filter(f => f.level === 'error').length,
+      validationWarnings: data.validation.flags.filter(f => f.level === 'warning').length,
+      validationFlags: data.validation.flags,
     });
   }
   res.json(students);

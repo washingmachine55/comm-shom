@@ -17,16 +17,28 @@ function detectDeckType(records) {
   return 'grammar';
 }
 
-function getWeekWindow(records) {
-  let dates;
-  if (Object.hasOwn(records[0], "t")) {
-    dates = records.map(r => new Date(r.t));
-  } else {
-    dates = records.map(r => new Date(r.ts_iso));
+function getWeekWindow(records, weekMode = 'current', customStart = null, customEnd = null) {
+  const dates = records.map(r => new Date(Object.hasOwn(r, "t") ? r.t : r.ts_iso));
+  const minDate = new Date(Math.min(...dates));
+  const maxDate = new Date(Math.max(...dates));
+
+  if (weekMode === 'custom' && customStart && customEnd) {
+    const monday = new Date(customStart);
+    monday.setHours(0, 0, 0, 0);
+    const friday = new Date(customEnd);
+    friday.setHours(23, 59, 59, 999);
+    return { monday, friday, minDate, maxDate };
+  }
+
+  if (weekMode === 'data') {
+    const monday = new Date(minDate);
+    monday.setHours(0, 0, 0, 0);
+    const friday = new Date(maxDate);
+    friday.setHours(23, 59, 59, 999);
+    return { monday, friday, minDate, maxDate };
   }
 
   const now = new Date();
-  // Most recent Monday
   const dayOfWeek = now.getDay();
   const monday = new Date(now);
   monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
@@ -34,7 +46,7 @@ function getWeekWindow(records) {
   const friday = new Date(monday);
   friday.setDate(monday.getDate() + 4);
   friday.setHours(23, 59, 59, 999);
-  return { monday, friday, minDate: new Date(Math.min(...dates)), maxDate: new Date(Math.max(...dates)) };
+  return { monday, friday, minDate, maxDate };
 }
 
 function validate(records, weekWindow) {
@@ -140,7 +152,7 @@ function buildDailyActivity(records) {
     }
     if (!days[day]) days[day] = { date: day, count: 0, totalMs: 0 };
     days[day].count++;
-    days[day].totalMs += r.ms;
+    days[day].totalMs += Object.hasOwn(r, "ms") ? r.ms : r.review_time_ms;
   });
   return Object.values(days).sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -148,19 +160,15 @@ function buildDailyActivity(records) {
 function buildWeaknesses(records, deckType) {
   const cardMap = {};
   records.forEach(r => {
-    let key;
-    if (Object.hasOwn(r, "flds")) {
-      key = r.flds?.[0] || 'unknown';
-      console.log("flds: ", key);
-    } else {
-      console.log("fields: ", key);
-      key = r.fields?.[0] || 'unknown';
-    }
-    const label = deckType === 'vocabulary' ? (r.flds?.[1] || key) : (r.flds?.[2] || key);
-    if (!cardMap[key]) cardMap[key] = { id: key, label, easeHistory: [], lapses: r.li || 0, lastEase: r.e };
-    cardMap[key].easeHistory.push(r.e);
-    cardMap[key].lastEase = r.e;
-    cardMap[key].lapses = Math.max(cardMap[key].lapses, r.li || 0);
+    const flds = Object.hasOwn(r, "flds") ? r.flds : r.fields;
+    const ease = Object.hasOwn(r, "e") ? r.e : r.ease;
+    const lapses = Object.hasOwn(r, "li") ? r.li : r.last_interval;
+    const key = flds?.[0] || 'unknown';
+    const label = deckType === 'vocabulary' ? (flds?.[1] || key) : (flds?.[2] || key);
+    if (!cardMap[key]) cardMap[key] = { id: key, label, easeHistory: [], lapses: lapses || 0, lastEase: ease };
+    cardMap[key].easeHistory.push(ease);
+    cardMap[key].lastEase = ease;
+    cardMap[key].lapses = Math.max(cardMap[key].lapses, lapses || 0);
   });
 
   return Object.values(cardMap)
@@ -183,16 +191,20 @@ function buildTimeDistribution(records) {
     { label: '60s (capped)', min: 59900, max: Infinity, count: 0 },
   ];
   records.forEach(r => {
+    const ms = Object.hasOwn(r, "ms") ? r.ms : r.review_time_ms;
     for (const b of buckets) {
-      if (r.ms >= b.min && r.ms < b.max) { b.count++; break; }
+      if (ms >= b.min && ms < b.max) { b.count++; break; }
     }
   });
   return buckets;
 }
 
-export function analyzeSession(studentName, records) {
+export function analyzeSession(studentName, records, options = {}) {
+  if (!records || records.length === 0) {
+    return { studentName, error: 'No records found.' };
+  }
   const deckType = detectDeckType(records);
-  const weekWindow = getWeekWindow(records);
+  const weekWindow = getWeekWindow(records, options.weekMode, options.customStart, options.customEnd);
   const validation = validate(records, weekWindow);
   const ease = buildEaseDistribution(records);
   const dailyActivity = buildDailyActivity(records);
@@ -201,7 +213,7 @@ export function analyzeSession(studentName, records) {
 
   const total = records.length;
   const retention = total > 0 ? Math.round(((ease.good + ease.easy) / total) * 100) : 0;
-  const avgMs = total > 0 ? Math.round(records.reduce((s, r) => s + r.ms, 0) / total) : 0;
+  const avgMs = total > 0 ? Math.round(records.reduce((s, r) => s + (Object.hasOwn(r, "ms") ? r.ms : r.review_time_ms), 0) / total) : 0;
   const dominantEase = Object.entries(ease).sort((a, b) => b[1] - a[1])[0];
 
   const easeLabels = { again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy' };
@@ -217,6 +229,7 @@ export function analyzeSession(studentName, records) {
     },
     validation,
     summary: {
+      deckType,
       totalReviews: total,
       retention,
       avgTimePerCard: avgMs,
