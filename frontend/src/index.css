@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-display: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Ink palette */
+  --color-ink-50: #f5f6f8;
+  --color-ink-100: #e8eaef;
+  --color-ink-200: #c9cdd8;
+  --color-ink-300: #9aa0b4;
+  --color-ink-400: #636d87;
+  --color-ink-500: #3d4559;
+  --color-ink-600: #232b3e;
+  --color-ink-700: #161c2c;
+  --color-ink-800: #0f1117;
+  --color-ink-900: #080b10;
+
+  /* Brand palette */
+  --color-brand: #5b6af7;
+  --color-brand-50: #eef0ff;
+  --color-brand-100: #d8dcff;
+  --color-brand-200: #b3bbff;
+  --color-brand-300: #8590ff;
+  --color-brand-400: #5b6af7;
+  --color-brand-500: #3d4fe8;
+  --color-brand-600: #2d3cd4;
+  --color-brand-700: #2431ac;
+  --color-brand-800: #1e298a;
+  --color-brand-900: #1a246d;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* Animations */
+  --animate-fade-up: fadeUp 0.4s ease both;
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-pulse-slow: pulse 3s infinite;
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-ink-900 text-ink-50;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-ink-800 rounded-2xl border border-ink-700 p-5;
+  }
+
+  .card-sm {
+    @apply bg-ink-800 rounded-xl border border-ink-700 p-4;
+  }
+
+  .btn-primary {
+    @apply bg-brand text-white font-medium px-5 py-2.5 rounded-xl hover:bg-brand-500 transition-colors text-sm cursor-pointer;
+    font-family: var(--font-display);
+  }
+
+  .btn-ghost {
+    @apply text-ink-300 hover:text-ink-50 hover:bg-ink-700 px-4 py-2 rounded-lg transition-colors text-sm cursor-pointer;
+    font-family: var(--font-display);
+  }
+
+  .label {
+    @apply text-xs font-medium text-ink-400 uppercase tracking-wider;
+    font-family: var(--font-display);
+  }
+
+  .stat-value {
+    @apply text-2xl font-semibold text-ink-50;
+    font-family: var(--font-display);
+  }
+
+  .badge {
+    @apply text-xs font-medium px-2.5 py-1 rounded-full;
+    font-family: var(--font-display);
+  }
+}
+
+.shimmer-bg {
+  background: linear-gradient(90deg, #161c2c 25%, #1e2740 50%, #161c2c 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f1117;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232b3e;
+  border-radius: 3px;
+}
