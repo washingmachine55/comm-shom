@@ -12,10 +12,10 @@ function Skeleton() {
   return (
     <div className="space-y-6 animate-pulse">
       <div className="h-8 w-48 shimmer-bg rounded-xl" />
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[...Array(4)].map((_,i) => <div key={i} className="h-24 shimmer-bg rounded-2xl" />)}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[...Array(2)].map((_,i) => <div key={i} className="h-64 shimmer-bg rounded-2xl" />)}
       </div>
     </div>
@@ -82,13 +82,13 @@ export default function StudentPage() {
         </button>
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="font-display text-3xl font-semibold text-ink-50">{studentName}</h1>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink-50">{studentName}</h1>
               <span className={`badge ${deckType === 'vocabulary' ? 'bg-brand/20 text-brand-300' : 'bg-warning/15 text-warning'}`}>
                 {deckType}
               </span>
             </div>
-            <p className="text-ink-400 text-sm">
+            <p className="text-ink-400 text-xs md:text-sm">
               Week of {weekWindow.start} — data from {weekWindow.dataStart} to {weekWindow.dataEnd}
             </p>
           </div>
@@ -115,7 +115,7 @@ export default function StudentPage() {
       )}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard label="Retention rate" value={`${summary.retention}%`} sub="Good + Easy" icon={TrendingUp} color={retColor} />
         <StatCard label="Cards reviewed" value={summary.totalReviews} sub={`${summary.activeDays} active days`} icon={Zap} />
         <StatCard label="Avg. time / card" value={`${Math.round(summary.avgTimePerCard / 1000)}s`} sub="per review" icon={Clock} />
@@ -127,7 +127,7 @@ export default function StudentPage() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {/* Daily activity */}
         <div className="card">
           <h3 className="font-display font-semibold text-ink-100 mb-1">Daily practice</h3>

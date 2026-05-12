@@ -83,8 +83,8 @@ export default function UploadPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-up">
       <div>
-        <h1 className="font-display text-3xl font-semibold text-ink-50">Weekly Upload</h1>
-        <p className="text-ink-400 mt-1">Drop your students' Anki export files below to generate this week's report.</p>
+        <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink-50">Weekly Upload</h1>
+        <p className="text-ink-400 mt-1 text-sm md:text-base">Drop your students' Anki export files below to generate this week's report.</p>
       </div>
 
       {/* Week mode toggle */}
@@ -220,12 +220,12 @@ export default function UploadPage() {
                   <RetentionBar pct={r.summary.retention} />
                 </div>
 
-                <div className="flex items-center gap-6 shrink-0 text-right">
-                  <div>
+                <div className="flex items-center gap-4 shrink-0 text-right">
+                  <div className="hidden sm:block">
                     <p className="label">Reviews</p>
                     <p className="font-display font-semibold text-ink-100 text-lg">{r.summary.totalReviews}</p>
                   </div>
-                  <div>
+                  <div className="hidden sm:block">
                     <p className="label">Active days</p>
                     <p className="font-display font-semibold text-ink-100 text-lg">{r.summary.activeDays}</p>
                   </div>

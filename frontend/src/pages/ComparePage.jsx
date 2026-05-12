@@ -96,7 +96,7 @@ export default function ComparePage() {
   return (
     <div className="max-w-5xl mx-auto space-y-7 animate-fade-up">
       <div>
-        <h1 className="text-3xl font-semibold font-display text-ink-50">Class comparison</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold font-display text-ink-50">Class comparison</h1>
         <p className="mt-1 text-ink-400">{students.length} students loaded this week</p>
       </div>
 

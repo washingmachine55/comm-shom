@@ -16,8 +16,8 @@ export default function Layout({ children, user, onLogout }) {
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-60 bg-ink-800 border-r border-ink-700 flex flex-col fixed h-full z-10">
+      {/* Sidebar — desktop only */}
+      <aside className="w-60 bg-ink-800 border-r border-ink-700 flex-col fixed h-full z-10 hidden md:flex">
         <div className="p-5 border-b border-ink-700">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
@@ -63,11 +63,29 @@ export default function Layout({ children, user, onLogout }) {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 ml-60 min-h-screen">
-        <div className="p-8">
+      <main className="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">
+        <div className="p-4 md:p-8">
           {children}
         </div>
       </main>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-ink-800 border-t border-ink-700 flex md:hidden z-10">
+        {nav.map(({ to, icon: Icon, label }) => (
+          <NavLink key={to} to={to} className={({ isActive }) =>
+            `flex-1 flex flex-col items-center gap-1 py-3 text-xs font-display transition-all ${
+              isActive ? 'text-brand-300' : 'text-ink-400'
+            }`
+          }>
+            <Icon size={20} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+        <button onClick={logout} className="flex-1 flex flex-col items-center gap-1 py-3 text-xs text-ink-400 font-display">
+          <LogOut size={20} />
+          <span>Sign out</span>
+        </button>
+      </nav>
     </div>
   )
 }
