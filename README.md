@@ -13,25 +13,17 @@ A weekly Anki stats tracker for communication skills classes.
 
 ### 1. Install dependencies
 ```bash
-cd backend && npm install
-cd ../frontend && npm install
+npm run install:all
 ```
 
-### 2. Run backend (terminal 1)
+### 2. Run backend & frontend concurrently
 ```bash
-cd backend
-node src/index.js
-# Runs on http://localhost:3001
+npm run start
+# Backend APIs Runs on http://localhost:3001
+# Frontend Runs on http://localhost:5173
 ```
 
-### 3. Run frontend (terminal 2)
-```bash
-cd frontend
-npm run dev
-# Runs on http://localhost:5173
-```
-
-### 4. Login
+### 3. Login
 - Username: `teacher`
 - Password: `teach123`
 

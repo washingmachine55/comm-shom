@@ -77,7 +77,7 @@ export default function StudentPage() {
     <div className="max-w-5xl mx-auto space-y-7 animate-fade-up">
       {/* Header */}
       <div>
-        <button onClick={() => navigate('/upload')} className="btn-ghost flex items-center gap-2 mb-4 -ml-2">
+        <button onClick={() => navigate('/compare')} className="btn-ghost flex items-center gap-2 mb-4 -ml-2">
           <ArrowLeft size={15} /> Back
         </button>
         <div className="flex items-start justify-between">

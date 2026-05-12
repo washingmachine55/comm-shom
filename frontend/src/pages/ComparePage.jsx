@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Users } from 'lucide-react'
+import { ArrowRight, TrashIcon, Users } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
@@ -25,7 +25,18 @@ export default function ComparePage() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-
+  const deleteItem = (id) => {
+    fetch(`http://localhost:3001/api/stats/${id}`, {
+      method: 'DELETE',
+    })
+      .then(response => {
+        if (response.ok) {
+          // Update local state to remove the item from UI
+          setStudents(students.filter(item => item.id !== id));
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  };
   useEffect(() => {
     fetch('http://localhost:3001/api/stats/compare/all', { credentials: 'include' })
       .then(r => r.json())
@@ -93,8 +104,8 @@ export default function ComparePage() {
                 const btnColor = s.dominantButton === 'Again' ? 'text-danger' : s.dominantButton === 'Hard' ? 'text-warning' : s.dominantButton === 'Good' ? 'text-brand-300' : 'text-success'
                 return (
                   <tr key={s.id} className="border-b border-ink-700/50 hover:bg-ink-700/30 transition-colors cursor-pointer group"
-                    onClick={() => navigate(`/student/${s.id}`)}>
-                    <td className="px-5 py-3.5">
+                  >
+                    <td className="px-5 py-3.5" onClick={() => navigate(`/student/${s.id}`)}>
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-display font-semibold text-white"
                           style={{ background: STUDENT_COLORS[i % STUDENT_COLORS.length] }}>
@@ -116,7 +127,7 @@ export default function ComparePage() {
                       <span className={`font-display font-medium ${btnColor}`}>{s.dominantButton}</span>
                     </td>
                     <td className="px-4 py-3.5 text-right">
-                      <ArrowRight size={14} className="text-ink-600 group-hover:text-ink-300 transition-colors ml-auto" />
+                      <TrashIcon size={16} className="text-red-200 hover:text-red-400 transition-colors m-auto mb-0.5" onClick={() => deleteItem(s.id)} />
                     </td>
                   </tr>
                 )

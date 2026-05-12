@@ -19,6 +19,13 @@ router.get('/:id', (req, res) => {
   res.json(data);
 });
 
+router.delete('/:id', (req, res) => {
+  const data = sessionStore.get(req.params.id);
+  if (!data) return res.status(404).json({ error: 'Not found' });
+  sessionStore.delete(req.params.id);
+  res.json({ data: "deleted" });
+});
+
 // Class comparison
 router.get('/compare/all', (req, res) => {
   const students = [];

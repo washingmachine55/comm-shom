@@ -71,7 +71,6 @@ export default function LoginPage({ onLogin }) {
               {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'Sign in'}
             </button>
           </form>
-          <p className="text-xs text-ink-500 text-center mt-4">Default: teacher / teach123</p>
         </div>
       </div>
     </div>
