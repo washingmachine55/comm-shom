@@ -6,16 +6,21 @@ import {
   RadialBarChart, RadialBar, Cell, PieChart, Pie, Legend
 } from 'recharts'
 
+import process from "node:process"
+
+process.loadEnvFile("../.env")
+const BACKEND = process.env.FRONTEND_URL;
+
 const EASE_COLORS = { again: '#ef4444', hard: '#f59e0b', good: '#5b6af7', easy: '#22c55e' }
 
 function Skeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="h-8 w-48 shimmer-bg rounded-xl" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="w-48 h-8 shimmer-bg rounded-xl" />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[...Array(4)].map((_,i) => <div key={i} className="h-24 shimmer-bg rounded-2xl" />)}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[...Array(2)].map((_,i) => <div key={i} className="h-64 shimmer-bg rounded-2xl" />)}
       </div>
     </div>
@@ -30,7 +35,7 @@ function StatCard({ label, value, sub, icon: Icon, color = 'text-ink-50' }) {
         {Icon && <Icon size={15} className="text-ink-500" />}
       </div>
       <p className={`stat-value ${color}`}>{value}</p>
-      {sub && <p className="text-xs text-ink-400 mt-1">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-ink-400">{sub}</p>}
     </div>
   )
 }
@@ -38,8 +43,8 @@ function StatCard({ label, value, sub, icon: Icon, color = 'text-ink-50' }) {
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-ink-800 border border-ink-600 rounded-xl px-4 py-3 text-sm shadow-xl">
-      <p className="font-display font-medium text-ink-100 mb-2">{label}</p>
+    <div className="px-4 py-3 text-sm border shadow-xl bg-ink-800 border-ink-600 rounded-xl">
+      <p className="mb-2 font-medium font-display text-ink-100">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }} className="font-mono">{p.name}: {p.value}</p>
       ))}
@@ -54,7 +59,7 @@ export default function StudentPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/stats/${id}`, { credentials: 'include' })
+    fetch(`${BACKEND}/api/stats/${id}`, { credentials: 'include' })
       .then(r => r.json())
       .then(setData)
       .catch(console.error)
@@ -62,7 +67,7 @@ export default function StudentPage() {
   }, [id])
 
   if (loading) return <div className="max-w-5xl mx-auto animate-fade-up"><Skeleton /></div>
-  if (!data) return <div className="text-center py-20 text-ink-400">Student data not found.</div>
+  if (!data) return <div className="py-20 text-center text-ink-400">Student data not found.</div>
 
   const { summary, charts, validation, studentName, deckType, weekWindow } = data
   const easeData = [
@@ -77,18 +82,18 @@ export default function StudentPage() {
     <div className="max-w-5xl mx-auto space-y-7 animate-fade-up">
       {/* Header */}
       <div>
-        <button onClick={() => navigate('/compare')} className="btn-ghost flex items-center gap-2 mb-4 -ml-2">
+        <button onClick={() => navigate('/compare')} className="flex items-center gap-2 mb-4 -ml-2 btn-ghost">
           <ArrowLeft size={15} /> Back
         </button>
         <div className="flex items-start justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink-50">{studentName}</h1>
+              <h1 className="text-2xl font-semibold font-display md:text-3xl text-ink-50">{studentName}</h1>
               <span className={`badge ${deckType === 'vocabulary' ? 'bg-brand/20 text-brand-300' : 'bg-warning/15 text-warning'}`}>
                 {deckType}
               </span>
             </div>
-            <p className="text-ink-400 text-xs md:text-sm">
+            <p className="text-xs text-ink-400 md:text-sm">
               Week of {weekWindow.start} — data from {weekWindow.dataStart} to {weekWindow.dataEnd}
             </p>
           </div>
@@ -109,13 +114,13 @@ export default function StudentPage() {
         </div>
       )}
       {validation.flags.length === 0 && (
-        <div className="flex items-center gap-2 text-success text-sm">
+        <div className="flex items-center gap-2 text-sm text-success">
           <CheckCircle size={15} /> All validation checks passed
         </div>
       )}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard label="Retention rate" value={`${summary.retention}%`} sub="Good + Easy" icon={TrendingUp} color={retColor} />
         <StatCard label="Cards reviewed" value={summary.totalReviews} sub={`${summary.activeDays} active days`} icon={Zap} />
         <StatCard label="Avg. time / card" value={`${Math.round(summary.avgTimePerCard / 1000)}s`} sub="per review" icon={Clock} />
@@ -127,11 +132,11 @@ export default function StudentPage() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         {/* Daily activity */}
         <div className="card">
-          <h3 className="font-display font-semibold text-ink-100 mb-1">Daily practice</h3>
-          <p className="text-xs text-ink-400 mb-5">Cards reviewed per session</p>
+          <h3 className="mb-1 font-semibold font-display text-ink-100">Daily practice</h3>
+          <p className="mb-5 text-xs text-ink-400">Cards reviewed per session</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={charts.dailyActivity} barSize={28}>
               <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" vertical={false} />
@@ -146,8 +151,8 @@ export default function StudentPage() {
 
         {/* Button distribution */}
         <div className="card">
-          <h3 className="font-display font-semibold text-ink-100 mb-1">Button distribution</h3>
-          <p className="text-xs text-ink-400 mb-5">How the student rated each card</p>
+          <h3 className="mb-1 font-semibold font-display text-ink-100">Button distribution</h3>
+          <p className="mb-5 text-xs text-ink-400">How the student rated each card</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={easeData} barSize={36} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" horizontal={false} />
@@ -164,8 +169,8 @@ export default function StudentPage() {
 
       {/* Time spent distribution */}
       <div className="card">
-        <h3 className="font-display font-semibold text-ink-100 mb-1">Time spent per card</h3>
-        <p className="text-xs text-ink-400 mb-5">How long the student spent on each card — cards hitting 60s were likely left open</p>
+        <h3 className="mb-1 font-semibold font-display text-ink-100">Time spent per card</h3>
+        <p className="mb-5 text-xs text-ink-400">How long the student spent on each card — cards hitting 60s were likely left open</p>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={charts.timeDistribution} barSize={44}>
             <CartesianGrid strokeDasharray="3 3" stroke="#232b3e" vertical={false} />
@@ -184,14 +189,14 @@ export default function StudentPage() {
       {/* Weak cards */}
       {charts.weaknesses.length > 0 && (
         <div className="card">
-          <h3 className="font-display font-semibold text-ink-100 mb-1">Cards to focus on</h3>
-          <p className="text-xs text-ink-400 mb-5">Cards rated Again or Hard — sorted by difficulty</p>
+          <h3 className="mb-1 font-semibold font-display text-ink-100">Cards to focus on</h3>
+          <p className="mb-5 text-xs text-ink-400">Cards rated Again or Hard — sorted by difficulty</p>
           <div className="space-y-2">
             {charts.weaknesses.map((w, i) => (
               <div key={i} className="flex items-center gap-4 px-4 py-3 bg-ink-900 rounded-xl">
-                <span className="text-xs font-mono text-ink-500 w-4">{i + 1}</span>
+                <span className="w-4 font-mono text-xs text-ink-500">{i + 1}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-display text-ink-100 truncate">{w.label}</p>
+                  <p className="text-sm truncate font-display text-ink-100">{w.label}</p>
                   <p className="text-xs text-ink-400 mt-0.5">{w.lapses} lapses · {w.reviewCount} review{w.reviewCount !== 1 ? 's' : ''}</p>
                 </div>
                 <div className="flex items-center gap-2">

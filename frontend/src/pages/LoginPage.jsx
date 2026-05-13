@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { BookOpen, AlertCircle } from 'lucide-react'
 
+import process from "node:process"
+
+process.loadEnvFile("../.env")
+const BACKEND = process.env.FRONTEND_URL;
+
 export default function LoginPage({ onLogin }) {
   const [form, setForm] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
@@ -11,7 +16,7 @@ export default function LoginPage({ onLogin }) {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch(`${BACKEND}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -28,14 +33,14 @@ export default function LoginPage({ onLogin }) {
   }
 
   return (
-    <div className="min-h-screen bg-ink-900 flex items-center justify-center p-4">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-ink-900">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-brand flex items-center justify-center mb-4 shadow-lg shadow-brand/30">
+          <div className="flex items-center justify-center mb-4 shadow-lg w-14 h-14 rounded-2xl bg-brand shadow-brand/30">
             <BookOpen size={26} className="text-white" />
           </div>
-          <h1 className="font-display text-2xl font-semibold text-ink-50">Anki Tracker</h1>
-          <p className="text-ink-400 text-sm mt-1">Communication Skills Dashboard</p>
+          <h1 className="text-2xl font-semibold font-display text-ink-50">Anki Tracker</h1>
+          <p className="mt-1 text-sm text-ink-400">Communication Skills Dashboard</p>
         </div>
 
         <div className="card">
@@ -67,8 +72,8 @@ export default function LoginPage({ onLogin }) {
                 placeholder="••••••••"
               />
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 mt-2">
-              {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'Sign in'}
+            <button type="submit" disabled={loading} className="flex items-center justify-center w-full gap-2 mt-2 btn-primary">
+              {loading ? <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin" /> : 'Sign in'}
             </button>
           </form>
         </div>

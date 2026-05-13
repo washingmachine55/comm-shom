@@ -6,6 +6,11 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
 } from 'recharts'
 
+import process from "node:process"
+
+process.loadEnvFile("../.env")
+const BACKEND = process.env.FRONTEND_URL;
+
 function FlagTooltip({ icon, flags }) {
   return (
     <div className="relative group/tip z-99">
@@ -47,7 +52,7 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const deleteItem = (id) => {
-    fetch(`http://localhost:3001/api/stats/${id}`, {
+    fetch(`${BACKEND}/api/stats/${id}`, {
       method: 'DELETE',
     })
       .then(response => {
@@ -59,7 +64,7 @@ export default function ComparePage() {
       .catch(error => console.error('Error:', error));
   };
   useEffect(() => {
-    fetch('http://localhost:3001/api/stats/compare/all', { credentials: 'include' })
+    fetch(`${BACKEND}/api/stats/compare/all`, { credentials: 'include' })
       .then(r => r.json())
       .then(setStudents)
       .catch(console.error)
@@ -96,7 +101,7 @@ export default function ComparePage() {
   return (
     <div className="max-w-5xl mx-auto space-y-7 animate-fade-up">
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold font-display text-ink-50">Class comparison</h1>
+        <h1 className="text-2xl font-semibold md:text-3xl font-display text-ink-50">Class comparison</h1>
         <p className="mt-1 text-ink-400">{students.length} students loaded this week</p>
       </div>
 

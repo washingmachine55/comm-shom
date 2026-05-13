@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import process from "node:process"
+
+process.loadEnvFile("../.env")
+const BACKEND = process.env.FRONTEND_URL;
 
 export default defineConfig({
   plugins: [react()],
@@ -7,7 +11,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: BACKEND,
         changeOrigin: true,
       }
     }

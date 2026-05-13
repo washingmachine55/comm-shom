@@ -8,7 +8,10 @@ import { router as authRouter } from './routes/auth.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+process.loadEnvFile("../.env")
+console.log(process.env.FRONTEND_URL);
+
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: false }));
 app.use(express.json());
 app.use(session({
   secret: 'anki-dashboard-secret-change-in-prod',
@@ -25,3 +28,5 @@ app.use('/api/stats', statsRouter);
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+
+export default app;

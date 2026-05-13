@@ -5,7 +5,7 @@ export default function Layout({ children, user, onLogout }) {
   const navigate = useNavigate()
 
   const logout = async () => {
-    await fetch('http://localhost:3001/api/auth/logout', { method: 'POST', credentials: 'include' })
+    await fetch(`${BACKEND}/api/auth/logout', { method: 'POST', credentials: 'include' })
     onLogout()
   }
 

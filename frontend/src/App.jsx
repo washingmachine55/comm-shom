@@ -1,17 +1,20 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+// import { useState, useEffect } from 'react'
 import Layout from './components/Layout.jsx'
 // import LoginPage from './pages/LoginPage.jsx'
 import UploadPage from './pages/UploadPage.jsx'
 import StudentPage from './pages/StudentPage.jsx'
 import ComparePage from './pages/ComparePage.jsx'
 
+import process from "node:process"
+process.loadEnvFile("../.env")
+
 export default function App() {
   // const [user, setUser] = useState(null)
-  const [checking, setChecking] = useState(true)
+  // const [checking, setChecking] = useState(true)
 
   // useEffect(() => {
-  //   fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })
+  //   fetch(`${BACKEND}/api/auth/me', { credentials: 'include' })
   //     .then(r => r.json())
   //     .then(d => { if (d.user) setUser(d.user) })
   //     .catch(() => {})
@@ -19,18 +22,18 @@ export default function App() {
   // }, [])
 
   // if (checking) return (
-  //   <div className="h-screen flex items-center justify-center bg-ink-900">
-  //     <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+  //   <div className="flex items-center justify-center h-screen bg-ink-900">
+  //     <div className="w-8 h-8 border-2 rounded-full border-brand border-t-transparent animate-spin" />
   //   </div>
   // )
 
   const user = { id: 'admin-001', name: 'Admin', role: 'admin' }
 
-  if (!user) return <LoginPage onLogin={setUser} />
+  // if (!user) return <LoginPage onLogin={setUser} />
 
   return (
-    <Layout user={user} onLogout={() => setUser(null)}>
-      {/* <Layout user={user}> */}
+    // <Layout user={user} onLogout={() => setUser(null)}>
+    <Layout user={user}>
       <Routes>
         <Route path="/" element={<Navigate to="/upload" replace />} />
         <Route path="/upload" element={<UploadPage />} />
