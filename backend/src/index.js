@@ -9,7 +9,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 process.loadEnvFile("../.env")
-console.log(process.env.FRONTEND_URL);
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: false }));
 app.use(express.json());

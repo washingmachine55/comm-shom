@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { BookOpen, AlertCircle } from 'lucide-react'
 
-import process from "node:process"
-
-process.loadEnvFile("../.env")
-const BACKEND = process.env.FRONTEND_URL;
+const BACKEND = import.meta.env.VITE_API_URL
 
 export default function LoginPage({ onLogin }) {
   const [form, setForm] = useState({ username: '', password: '' })

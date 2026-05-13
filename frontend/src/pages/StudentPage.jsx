@@ -3,13 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Zap, Calendar, TrendingUp, AlertTriangle, XCircle, CheckCircle } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  RadialBarChart, RadialBar, Cell, PieChart, Pie, Legend
+  // RadialBarChart, RadialBar, PieChart, Pie, Legend
+  Cell,
 } from 'recharts'
 
-import process from "node:process"
-
-process.loadEnvFile("../.env")
-const BACKEND = process.env.FRONTEND_URL;
+const BACKEND = import.meta.env.VITE_API_URL
 
 const EASE_COLORS = { again: '#ef4444', hard: '#f59e0b', good: '#5b6af7', easy: '#22c55e' }
 

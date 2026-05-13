@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { TrashIcon, Users, XCircle, AlertTriangle } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
+  // RadarChart, PolarGrid, PolarAngleAxis, Radar,
+  Cell
 } from 'recharts'
 
-import process from "node:process"
-
-process.loadEnvFile("../.env")
-const BACKEND = process.env.FRONTEND_URL;
+const BACKEND = import.meta.env.VITE_API_URL
 
 function FlagTooltip({ icon, flags }) {
   return (

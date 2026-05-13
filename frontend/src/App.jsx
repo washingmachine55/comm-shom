@@ -6,9 +6,6 @@ import UploadPage from './pages/UploadPage.jsx'
 import StudentPage from './pages/StudentPage.jsx'
 import ComparePage from './pages/ComparePage.jsx'
 
-import process from "node:process"
-process.loadEnvFile("../.env")
-
 export default function App() {
   // const [user, setUser] = useState(null)
   // const [checking, setChecking] = useState(true)

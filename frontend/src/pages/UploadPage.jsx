@@ -3,10 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import { useNavigate } from 'react-router-dom'
 import { Upload, FileText, CheckCircle, AlertTriangle, XCircle, ArrowRight, Trash2, Users } from 'lucide-react'
 
-import process from "node:process"
-
-process.loadEnvFile("../.env")
-const BACKEND = process.env.FRONTEND_URL;
+const BACKEND = import.meta.env.VITE_API_URL
 
 function ValidationBadge({ flags }) {
   const errors = flags.filter(f => f.level === 'error')
